@@ -1,28 +1,18 @@
 /*
-    Inserting a Node at nth position
-    Insert(data, n)
+    To remove a node, we need to fix the links. We'll have to set the n-1th's link as the link of the nth node, which is the
+    n+1th node
 
-    Have to consider if n is an invalid position and if the head is null. Let's assume that the position we're
-    receiving is valid however.
+    If we want to remove the head, we'll have to point head to the second node, and then build the link between the second node
+    and the third node.
 
-    To insert a Node at the nth position, we have to look at n-1th Node in order to send the "link" field of the new Node
-    to be equal to the "link" field of the n-1th Node. Then we would set the "link" of the n-1th Node to be the address
-    of the newly created Node
-
-    Application's Memory:
-
-    Heap (Free Store) //Not fixed, and we can request memory in run-time (ie. malloc)
-
-    These are all fixed in sizes
-    Stack //function call executions and stores the local variables
-    Static/Global
-    Code(Text)
+    This isn't good enough however, since the nodes would still be taking up space in memory. This is because the node occupies
+    space from dynamic memory (in the heap). So we have to free() it! 
 */
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-struct Node
+struct Node 
 {
     int data;
     struct Node* next;
@@ -32,6 +22,7 @@ struct Node* head;
 
 void Insert(int data, int n);
 void Print();
+void Delete(int n); //delete node at position n
 
 void Insert(int data, int n)
 {
@@ -71,16 +62,43 @@ void Print()
     printf("\n");
 }
 
+
+void Delete(int n)
+{
+    struct Node* temp1 = head;
+    int i = 0;
+
+    if(n == 1)
+    {
+        head = temp1->next;
+        free(temp1);
+        return; 
+    }
+
+    for (i = 0; i < n-2; i++)
+    {
+        temp1 = temp1->next;
+    }
+
+    //temp1 now points to the (n-1)th node
+    struct Node* temp2 = temp1->next; //temp2 = nth Node
+    temp1->next = temp2->next; //creating a link between (n-1)th node and (n+1)th node 
+    free(temp2); //we can get rid of the allocated memory for the nth node now
+}   
+
 int main()
 {
     head = NULL;
-
-    //Insert enters the stack
-    Insert(2, 1); //List: 2
-    Insert(3, 2);//List: 2,3
-    Insert(4, 1);//List: 4, 2, 3
-    Insert(5, 2);//List: 4,5,2,3
-    Insert(6, 3);//List: 4,5,6,2,3
-    
+    Insert(2,1);
+    Insert(4, 1);
+    Insert(6, 1);
+    Insert(5, 1); //2,4,6,5
     Print();
+    int n;
+    printf("Enter a position: ");
+    scanf("%d", &n);
+
+    Delete(n);
+    Print();
+
 }
